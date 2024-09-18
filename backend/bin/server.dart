@@ -73,11 +73,34 @@ void main(List<String> args) async {
   // Use any available host or container IP (usually `0.0.0.0`).
   final ip = InternetAddress.anyIPv4;
 
-  // Configure a pipeline that logs requests.
+  final corsHeader = createMiddleware(
+    requestHandler: (req) {
+      if (req.method == "OPTIONS") {
+        return Response.ok('', headers: {
+          //Cho phep moi nguoi truy cap
+          'Acess-Control-Allow-Origin': '*',
+          'Acess-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
+          'Acess-Control-Allow-Headers': 'Content-Type,Authorization',
+        });
+      }
+      return null; //Tiep tuc xu ly cac yeu cau khac
+    },
+    responseHandler: (res) {
+      return res.change(headers: {
+        'Acess-Control-Allow-Origin': '*',
+        'Acess-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
+        'Acess-Control-Allow-Headers': 'Content-Type,Authorization',
+      });
+    },
+  );
+
+  // Cấu hình 1 pipeline để logs các requests và middleware
   final handler =
       Pipeline().addMiddleware(logRequests()).addHandler(_router.call);
 
-  // For running in containers, we respect the PORT environment variable.
+  // Để chạy trong các container, chúng ta sẽ sử dụng biến môi trường PORT.
+  //Nếu biến môi trường không được thiết lập nó sẽ sử dụng giá trị từ biến
+  // môi trường này;nếu không ,nó sẽ sử dụng giá trị mặc định là 8080
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port);
   print('Server listening on port ${server.port}');
