@@ -28,7 +28,7 @@ Response _rootHandler(Request req) {
 
 Response _checkHandler(Request req) {
   return Response.ok(
-    json.encode({'message': 'Chao mung ban den voi ung dung web dong'}),
+    json.encode({'message': 'Chu Tien Son'}),
     headers: _headers,
   );
 }
@@ -78,25 +78,27 @@ void main(List<String> args) async {
       if (req.method == "OPTIONS") {
         return Response.ok('', headers: {
           //Cho phep moi nguoi truy cap
-          'Acess-Control-Allow-Origin': '*',
-          'Acess-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
-          'Acess-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
         });
       }
       return null; //Tiep tuc xu ly cac yeu cau khac
     },
     responseHandler: (res) {
       return res.change(headers: {
-        'Acess-Control-Allow-Origin': '*',
-        'Acess-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
-        'Acess-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
       });
     },
   );
 
   // Cấu hình 1 pipeline để logs các requests và middleware
-  final handler =
-      Pipeline().addMiddleware(logRequests()).addHandler(_router.call);
+  final handler = Pipeline()
+      .addMiddleware(corsHeader)
+      .addMiddleware(logRequests())
+      .addHandler(_router.call);
 
   // Để chạy trong các container, chúng ta sẽ sử dụng biến môi trường PORT.
   //Nếu biến môi trường không được thiết lập nó sẽ sử dụng giá trị từ biến

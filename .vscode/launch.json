@@ -18,9 +18,11 @@
             "type": "dart",
             "args": [
                 "-d",
-                "chrome",
+                "edge",
                 "--web-port",
-                "8081"
+                "8081",
+                // "--web-renderer",
+                // "auto"
             ]
         },
         
